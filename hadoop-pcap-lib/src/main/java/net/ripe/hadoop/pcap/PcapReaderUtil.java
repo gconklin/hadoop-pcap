@@ -13,6 +13,8 @@ public class PcapReaderUtil {
 		protocols.put(1, PcapReader.PROTOCOL_ICMP);
 		protocols.put(6, PcapReader.PROTOCOL_TCP);
 		protocols.put(17, PcapReader.PROTOCOL_UDP);
+    protocols.put(46, PcapReader.PROTOCOL_RSVP);
+    protocols.put(47, PcapReader.PROTOCOL_GRE);
 	}
 
 	public static long convertInt(byte[] data) {
@@ -44,7 +46,12 @@ public class PcapReaderUtil {
 	}
 
 	public static String convertProtocolIdentifier(int identifier) {
-		return protocols.get(identifier);
+    String proto = protocols.get(identifier);
+
+    if ( proto == null )
+      proto = String.valueOf( identifier );
+
+    return proto;
 	}
 
 	public static String convertAddress(byte[] data, int offset) {

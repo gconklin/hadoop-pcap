@@ -35,6 +35,8 @@ public class PcapReader implements Iterable<Packet> {
 	public static final String PROTOCOL_ICMP = "ICMP";
 	public static final String PROTOCOL_TCP = "TCP";
 	public static final String PROTOCOL_UDP = "UDP";
+  public static final String PROTOCOL_GRE = "GRE";
+  public static final String PROTOCOL_RSVP = "RSVP";
 	public static final boolean debug = false;
 
 	private final DataInputStream is;
