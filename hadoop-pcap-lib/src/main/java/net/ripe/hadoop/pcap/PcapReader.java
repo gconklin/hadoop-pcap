@@ -131,11 +131,11 @@ public class PcapReader implements Iterable<Packet> {
 		if (!readBytes(packetData))
 			return packet;
 
+		packet.put(Packet.ETHERTYPE, getEtherType(packetData) );
+
 		int ipStart = findIPStart(packetData);
 		if (ipStart == -1)
 			return packet;
-
-		packet.put(Packet.ETHERTYPE, getEtherType(linkType, packetData) );
 
 		if (getInternetProtocolHeaderVersion(packetData, ipStart) == 4) {
 			buildInternetProtocolV4Packet(packet, packetData, ipStart);
@@ -182,7 +182,7 @@ public class PcapReader implements Iterable<Packet> {
 	}
 
 	// see: http://en.wikipedia.org/wiki/EtherType
-	protected String getEtherType(LinkType linkType, byte[] packet) {
+	protected String getEtherType(byte[] packet) {
 		if (linkType == LinkType.EN10MB) {
 				int etherType = PcapReaderUtil.convertShort(packet, ETHERNET_TYPE_OFFSET);
 				switch ( etherType ) {
