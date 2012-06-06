@@ -6,6 +6,7 @@ import java.util.Map;
 public class Packet extends HashMap<String, Object> {
 	private static final long serialVersionUID = 8723206921174160146L;
 
+  public static final String ETHERTYPE    = "ether_type";
 	public static final String TIMESTAMP = "ts";
 	public static final String TTL = "ttl";
 	public static final String PROTOCOL = "protocol";

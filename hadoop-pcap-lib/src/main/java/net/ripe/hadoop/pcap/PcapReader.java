@@ -35,8 +35,8 @@ public class PcapReader implements Iterable<Packet> {
 	public static final String PROTOCOL_ICMP = "ICMP";
 	public static final String PROTOCOL_TCP = "TCP";
 	public static final String PROTOCOL_UDP = "UDP";
-  public static final String PROTOCOL_GRE = "GRE";
-  public static final String PROTOCOL_RSVP = "RSVP";
+	public static final String PROTOCOL_GRE = "GRE";
+	public static final String PROTOCOL_RSVP = "RSVP";
 	public static final boolean debug = false;
 
 	private final DataInputStream is;
@@ -84,7 +84,7 @@ public class PcapReader implements Iterable<Packet> {
 		 * No Checksum on this packet?
 		 */
 		if (packetData[ipStart + ipHeaderLen + 6] == 0 &&
-		    packetData[ipStart + ipHeaderLen + 7] == 0)
+				packetData[ipStart + ipHeaderLen + 7] == 0)
 			return -1;
 
 		/*
@@ -92,7 +92,7 @@ public class PcapReader implements Iterable<Packet> {
 		 * followed by the entire UDP packet.
 		 */
 		byte data[] = new byte[packetData.length - ipStart - ipHeaderLen + 12];
-    		short answer;
+				short answer;
 		int sum = 0;
 		System.arraycopy(packetData, ipStart + IP_SRC_OFFSET,      data, 0, 4);
 		System.arraycopy(packetData, ipStart + IP_DST_OFFSET,      data, 4, 4);
@@ -135,12 +135,14 @@ public class PcapReader implements Iterable<Packet> {
 		if (ipStart == -1)
 			return packet;
 
+		packet.put(Packet.ETHERTYPE, getEtherType(linkType, packetData) );
+
 		if (getInternetProtocolHeaderVersion(packetData, ipStart) == 4) {
 			buildInternetProtocolV4Packet(packet, packetData, ipStart);
 	
 			String protocol = (String)packet.get(Packet.PROTOCOL);
 			if (PROTOCOL_UDP == protocol || 
-			    PROTOCOL_TCP == protocol) {
+					PROTOCOL_TCP == protocol) {
 	
 				byte[] packetPayload = buildTcpAndUdpPacket(packet, packetData, ipStart);
 				processPacketPayload(packet, packetPayload);
@@ -177,6 +179,33 @@ public class PcapReader implements Iterable<Packet> {
 				return LinkType.LOOP;
 		}
 		return null;
+	}
+
+	// see: http://en.wikipedia.org/wiki/EtherType
+	protected String getEtherType(LinkType linkType, byte[] packet) {
+		if (linkType == LinkType.EN10MB) {
+				int etherType = PcapReaderUtil.convertShort(packet, ETHERNET_TYPE_OFFSET);
+				switch ( etherType ) {
+					case 0x0800:
+						return "IPv4";
+
+					case 0x0806:
+						return "arp";
+
+					case 0x8035:
+						return "rarp";
+
+					case 0x86dd:
+						return "IPv6";
+
+					case 0x8100:
+						return "vlan";
+				}
+
+				return String.format( "0x%04x", etherType );
+		}
+
+		return "";
 	}
 
 	protected int findIPStart(byte[] packet) {
