@@ -15,6 +15,7 @@ import org.xbill.DNS.Rcode;
 import org.xbill.DNS.Record;
 import org.xbill.DNS.Section;
 import org.xbill.DNS.Flags;
+import org.xbill.DNS.Type;
 
 public class DnsPcapReader extends PcapReader {
 	public static final int DNS_PORT = 53;
@@ -43,6 +44,7 @@ public class DnsPcapReader extends PcapReader {
 				dnsPacket.put(DnsPacket.RCODE, Rcode.string(header.getRcode()));
 				dnsPacket.put(DnsPacket.QNAME, convertRecordOwnerToString(msg.getQuestion()));
 				dnsPacket.put(DnsPacket.QTYPE, convertRecordTypeToInt(msg.getQuestion()));
+				dnsPacket.put(DnsPacket.QTYPE_STR, convertRecordTypeToString(msg.getQuestion()));
 				dnsPacket.put(DnsPacket.ANSWER, convertRecordsToStrings(msg.getSectionArray(Section.ANSWER)));
 				dnsPacket.put(DnsPacket.AUTHORITY, convertRecordsToStrings(msg.getSectionArray(Section.AUTHORITY)));
 				dnsPacket.put(DnsPacket.ADDITIONAL, convertRecordsToStrings(msg.getSectionArray(Section.ADDITIONAL)));
@@ -73,6 +75,12 @@ public class DnsPcapReader extends PcapReader {
 		if (record == null)
 			return 0;
 		return record.getType();
+	}
+
+	private String convertRecordTypeToString(Record record) {
+		if (record == null)
+			return null;
+		return Type.string( record.getType() );
 	}
 
 	private List<String> convertRecordsToStrings(Record[] records) {

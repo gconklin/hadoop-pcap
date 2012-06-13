@@ -10,6 +10,7 @@ public class DnsPacket extends Packet {
 	public static final String RCODE = "dns_rcode";
 	public static final String QNAME = "dns_qname";
 	public static final String QTYPE = "dns_qtype";
+	public static final String QTYPE_STR = "dns_qtype_str";
 	public static final String ANSWER = "dns_answer";
 	public static final String AUTHORITY = "dns_authority";
 	public static final String ADDITIONAL = "dns_additional";
