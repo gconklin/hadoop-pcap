@@ -16,6 +16,8 @@ public class Packet extends HashMap<String, Object> {
 	public static final String DST_PORT = "dst_port";
 	public static final String LEN = "len";
 	public static final String UDPSUM = "udpsum";
+  public static final String SIZE               = "size";
+  public static final String MD5                = "md5";
   public static final String FRAGMENTED         = "frag";
   public static final String PAYLOAD_LEN        = "payload_len";
   public static final String EXT_HEADER_COUNT   = "ext_count";

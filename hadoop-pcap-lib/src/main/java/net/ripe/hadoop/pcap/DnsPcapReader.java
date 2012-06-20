@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.hadoop.conf.Configuration;
+
 import net.ripe.hadoop.pcap.packet.DnsPacket;
 import net.ripe.hadoop.pcap.packet.Packet;
 
@@ -20,8 +22,8 @@ import org.xbill.DNS.Type;
 public class DnsPcapReader extends PcapReader {
 	public static final int DNS_PORT = 53;
 
-	public DnsPcapReader(DataInputStream is) throws IOException {
-		super(is);
+	public DnsPcapReader(DataInputStream is, Configuration conf) throws IOException {
+		super(is, conf);
 	}
 
 	@Override

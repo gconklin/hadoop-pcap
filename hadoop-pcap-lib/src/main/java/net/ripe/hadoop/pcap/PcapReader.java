@@ -4,6 +4,9 @@ import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.util.Iterator;
+import java.security.MessageDigest;
+
+import org.apache.hadoop.conf.Configuration;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -12,6 +15,8 @@ import net.ripe.hadoop.pcap.packet.Packet;
 
 public class PcapReader implements Iterable<Packet> {
 	public static final Log LOG = LogFactory.getLog(PcapReader.class);
+
+  public static final String CALCULATE_MD5 = "net.ripe.hadoop.pcap.PcapReader.calculateMD5";
 
 	public static final long MAGIC_NUMBER = 0xA1B2C3D4;
 	public static final int HEADER_SIZE = 24;
@@ -64,10 +69,26 @@ public class PcapReader implements Iterable<Packet> {
 	private LinkType linkType;
 	private boolean caughtEOF = false;
 	private int nPktsRead = 0;
+  private boolean calculateMD5 = false;
+  private MessageDigest md5 = null;
 
-	public PcapReader(DataInputStream is) throws IOException {
+	public PcapReader(DataInputStream is, Configuration conf) throws IOException {
 		this.is = is;
 		iterator = new PacketIterator();
+
+    calculateMD5 = conf.getBoolean( CALCULATE_MD5, false );
+
+    if ( calculateMD5 )
+    {
+      try {
+        md5 = MessageDigest.getInstance("MD5");
+      }
+      catch ( Exception e )
+      {
+        LOG.warn( "Could not load MD5 MessageDigest" );
+        calculateMD5 = false;
+      }
+    }
 
 		byte[] pcapHeader = new byte[HEADER_SIZE];
 		if (!readBytes(pcapHeader)) {
@@ -158,6 +179,13 @@ public class PcapReader implements Iterable<Packet> {
 		if (!readBytes(packetData))
 			return packet;
 
+    packet.put( Packet.SIZE, packetSize );
+    // this was for finding duplicate packets, but i don't always want to be calculating it
+    if ( calculateMD5 )
+    {
+      byte[] digest = md5.digest( packetData );
+      packet.put( Packet.MD5, PcapReaderUtil.toHexString( digest ) );
+    }
 		packet.put(Packet.ETHERTYPE, getEtherType(packetData) );
 
 		int ipStart = findIPStart(packetData);

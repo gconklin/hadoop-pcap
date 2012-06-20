@@ -55,7 +55,7 @@ public class PcapRecordReaderTest {
 		JobConf config = new JobConf();
 		FileSystem fs = FileSystem.get(config);
 		FSDataInputStream is = fs.open(new Path(TEST_FILE.getParent(), TEST_FILE.getName()));
-		recordReader = new PcapRecordReader(new PcapReader(is), 0L, TEST_FILE.length(), is, is, new TestableReporter());
+		recordReader = new PcapRecordReader(new PcapReader(is, config), 0L, TEST_FILE.length(), is, is, new TestableReporter());
 	}
 
 	@After

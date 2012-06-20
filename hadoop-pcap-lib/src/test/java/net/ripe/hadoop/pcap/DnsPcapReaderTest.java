@@ -7,6 +7,8 @@ import java.io.IOException;
 
 import net.ripe.hadoop.pcap.DnsPcapReader;
 
+import org.apache.hadoop.conf.Configuration;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.xbill.DNS.OPTRecord;
@@ -28,12 +30,20 @@ public class DnsPcapReaderTest {
 
 	private class TestableDnsPcapReader extends DnsPcapReader {
 		public TestableDnsPcapReader() throws IOException {
-			super(new DataInputStream(null) {
-				@Override
-				public int read() throws IOException {
-					return -1; // Return dummy data for test
-				}
-			});
+			super(
+        new DataInputStream(null) {
+          @Override
+          public int read() throws IOException {
+            return -1; // Return dummy data for test
+          }
+        }, 
+        new Configuration() {
+          @Override
+          public boolean getBoolean( String name, boolean defaultValue ) {
+            return defaultValue; 
+          }
+        }
+      );
 		}
 
 		@Override
